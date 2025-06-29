@@ -6,7 +6,7 @@ This repo provides the code for reproducing the experiments in LeanCode. LeanCod
 ## QuickStart
 ### Prepare data
 We used two datasets from [CodeBERT](https://arxiv.org/pdf/2002.08155): code search and code summarization datasets. These are the extensions of [CodeSearchNet](https://github.com/github/CodeSearchNet).
-You can download the code search dataset from [this website](https://drive.google.com/uc?id=1xgSR34XO8xXZg4cZScDYj2eGerBE9iGo), and download the code summarization dataset from [this website](https://drive.google.com/uc?id=1rd2Tc6oUWBo7JouwexW3ksQ0PaOhUr6h) Or use the following command.
+You can download the code search dataset from [this website](https://drive.google.com/uc?id=1xgSR34XO8xXZg4cZScDYj2eGerBE9iGo) or [this website](https://drive.google.com/file/d/1CRmpQ03t64dgk6Z-ZdpQijT8q8QKdueL/view?usp=sharing), and download the code summarization dataset from [this website](https://drive.google.com/uc?id=1rd2Tc6oUWBo7JouwexW3ksQ0PaOhUr6h) Or use the following command.
 
 ```
 mkdir data data/codesearch data/code2nl
