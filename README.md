@@ -21,12 +21,13 @@ unzip Cleaned_CodeSearchNet.zip
 rm Cleaned_CodeSearchNet.zip
 cd ../..
 ```
-Because of the algorithm of SlimCode need to remove all the comments in the code and remove the code that can't be converted to AST after removing the comments , so ,we download the test data from [SlimCode](https://github.com/gksajy/slimcode?tab=readme-ov-file)  . you need to download test data of code search and code summarization from [here](https://drive.google.com/drive/folders/1TlhFHyHODQbu7wu30Tg4TQCEmSsKiLJo) into `slimcode` floder :
+Because of the algorithm of SlimCode need to remove all the comments in the code and remove the code that can't be converted to AST after removing the comments, to use the same test dataset and compare with slimcode, we download the test data from [SlimCode](https://github.com/gksajy/slimcode?tab=readme-ov-file)  . you need to download test data of code search and code summarization from [here](https://drive.google.com/drive/folders/1TlhFHyHODQbu7wu30Tg4TQCEmSsKiLJo) into `slimcode` floder :
 ```
 cd slimcode
 mkdir data data/codesearch data/code2nl
 cd ..
 python utils/process_slimcode.py
+gunzip data/codesearch/java_test_0.jsonl.gz
 python codesearch/process_data.py
 ```
 ### Training
@@ -59,7 +60,7 @@ run codesearch/process_pruned_data.py
 ### Reproduce the experimental results
 We conducted code simplification experiments on two tasks, `code search` and `code summarization`, using two models: `CodeBERT` and `CodeT5`. These experiments involved four code simplification strategies—`LeanCode`,`SlimCode` , `DietCode`, and `LeanCode with the removal algorithm of DietCode` and five code simplification ratios: `10%`, `20%`, `30%`, `40%`, and `50%`.  
   
-You can use `gen_cmd.py` in `utils` floder to get the inference cmd to run a broad set of experiments by simply passing the `task_type`, `model_type`, `prune_strategy` and `prune_ratio` arguments. 
+You can use `gen_cmd.py` in `utils` floder to get the inference cmd to run a broad set of experiments by simply passing the `task_type`, `model_type`, `prune_strategy` and `prune_ratio` arguments. If the prune strategy is slimcode and the task type is codesearch, you need to use the `process_slimcode_pruned.py` in `utils` floder to process pruned data.
 Below is a table listing each parameter along with its description and available options:
 
 | Parameter          | Description                                           | Options                                                         |
