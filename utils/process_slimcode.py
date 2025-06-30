@@ -11,7 +11,7 @@ with open('./../slimcode/data/codesearch/test.txt','r')as r\
         ,open('./../slimcode/data/codesearch/test_with_tokens.txt','w')as w:
     lines=r.readlines()
     for line in lines:
-        label,url,name,nl,code=line.strip().split('<CODESPLIT>')
+        code,nl,url=line.strip().split('<CODESPLIT>')
         # code,nl=line.strip().split('<CODESPLIT>')
         words = code.split()
         word_to_subtoken_map = {}
@@ -25,14 +25,14 @@ with open('./../slimcode/data/codesearch/test.txt','r')as r\
         # 使用json.dumps来确保双引号
         all_tokens_json = json.dumps(all_tokens)
         word_to_subtoken_map_json = json.dumps(word_to_subtoken_map)
-        new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+label+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
+        new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+url+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
         w.write(new_line)
 
 with open('./../data/codesearch/slimcode/test.txt','r')as r\
         ,open('./../slimcode/data/codesearch/test_with_tokens_codebert.txt','w')as w:
     lines=r.readlines()
     for line in lines:
-        label,url,name,nl,code=line.strip().split('<CODESPLIT>')
+        code,nl,url=line.strip().split('<CODESPLIT>')
         # code,nl=line.strip().split('<CODESPLIT>')
         words = code.split()
         word_to_subtoken_map = {}
@@ -46,7 +46,7 @@ with open('./../data/codesearch/slimcode/test.txt','r')as r\
         # 使用json.dumps来确保双引号
         all_tokens_json = json.dumps(all_tokens)
         word_to_subtoken_map_json = json.dumps(word_to_subtoken_map)
-        new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+label+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
+        new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+url+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
         w.write(new_line)
 
 with open('./../data/code2nl/java/slimcode/test.txt','r')as r\
