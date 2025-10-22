@@ -7,8 +7,9 @@ def remove_special_tokens(token_list, special_char='Ġ'):
 tokenizer_codet5 = RobertaTokenizer.from_pretrained('Salesforce/codet5-base')
 tokenizer_codebert =RobertaTokenizer.from_pretrained('microsoft/codebert-base')
 # code search
-with open('./../slimcode/data/codesearch/test.txt','r')as r\
-        ,open('./../slimcode/data/codesearch/test_with_tokens.txt','w')as w:
+with open('./slimcode/data/codesearch/test.txt','r')as r\
+        ,open('./slimcode/data/codesearch/test_with_tokens.txt','w')as w:
+    print("正在处理codesearch/test.txt")
     lines=r.readlines()
     for line in lines:
         code,nl,url=line.strip().split('<CODESPLIT>')
@@ -27,9 +28,11 @@ with open('./../slimcode/data/codesearch/test.txt','r')as r\
         word_to_subtoken_map_json = json.dumps(word_to_subtoken_map)
         new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+url+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
         w.write(new_line)
+    print("已经将codesearch/test.txt转化为test_with_tokens.txt")
 
-with open('./../data/codesearch/slimcode/test.txt','r')as r\
-        ,open('./../slimcode/data/codesearch/test_with_tokens_codebert.txt','w')as w:
+with open('./slimcode/data/codesearch/test.txt','r')as r\
+        ,open('./slimcode/data/codesearch/test_with_tokens_codebert.txt','w')as w:
+    print("正在处理codesearch/test_with_tokens_codebert.txt")
     lines=r.readlines()
     for line in lines:
         code,nl,url=line.strip().split('<CODESPLIT>')
@@ -48,9 +51,11 @@ with open('./../data/codesearch/slimcode/test.txt','r')as r\
         word_to_subtoken_map_json = json.dumps(word_to_subtoken_map)
         new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+url+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
         w.write(new_line)
+    print("已经将codesearch/test.txt转化为test_with_tokens_codebert.txt")
 
-with open('./../data/code2nl/java/slimcode/test.txt','r')as r\
-        ,open('./../slimcode/data/code2nl/test_with_tokens.txt','w')as w:
+with open('./slimcode/data/code2nl/test.txt','r')as r\
+        ,open('./slimcode/data/code2nl/test_with_tokens.txt','w')as w:
+    print("正在处理code2nl/test.txt")
     lines=r.readlines()
     for line in lines:
         code,nl=line.strip().split('<CODESPLIT>')
@@ -68,9 +73,11 @@ with open('./../data/code2nl/java/slimcode/test.txt','r')as r\
         word_to_subtoken_map_json = json.dumps(word_to_subtoken_map)
         new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
         w.write(new_line)
+    print("已经将code2nl/test.txt转化为test_with_tokens.txt")
 
-with open('./../data/code2nl/java/slimcode/test.txt','r')as r\
-        ,open('./../slimcode/data/code2nl/test_with_tokens_codebert.txt','w')as w:
+with open('./slimcode/data/code2nl/test.txt','r')as r\
+        ,open('./slimcode/data/code2nl/test_with_tokens_codebert.txt','w')as w:
+    print("正在处理code2nl/test.txt")
     lines=r.readlines()
     for line in lines:
         code,nl=line.strip().split('<CODESPLIT>')
@@ -88,3 +95,4 @@ with open('./../data/code2nl/java/slimcode/test.txt','r')as r\
         word_to_subtoken_map_json = json.dumps(word_to_subtoken_map)
         new_line=code+'<CODESPLIT>'+nl+'<CODESPLIT>'+str(all_tokens_json)+'<CODESPLIT>'+str(word_to_subtoken_map_json)+'\n'
         w.write(new_line)
+    print("已经将code2nl/test.txt转化为test_with_tokens_codebert.txt")

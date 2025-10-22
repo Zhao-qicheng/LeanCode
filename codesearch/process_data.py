@@ -81,5 +81,5 @@ if __name__ == '__main__':
             for line in l_lines_new:
                 w.write(line)
 
-    preprocess_test_data('./../data/codesearch','java')
+    preprocess_test_data('./data/codesearch','java')
 
