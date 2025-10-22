@@ -1,2 +1,5 @@
 # 数据集目录
 data/
+
+# Python相关
+__pycache__/
