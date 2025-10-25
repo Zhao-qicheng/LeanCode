@@ -80,8 +80,9 @@ def eval_ppl_epoch(args, eval_data, eval_examples, model, tokenizer):
                 outputs = model(input_ids=source_ids, attention_mask=source_mask,
                                 labels=target_ids, decoder_attention_mask=target_mask)
                 loss = outputs.loss
-        # eval_loss += loss.mean().item()
-        eval_loss += loss.item()
+        
+        eval_loss += loss.mean().item()
+        # eval_loss += loss.item()
         batch_num += 1
     eval_loss = eval_loss / batch_num
     eval_ppl = round(np.exp(eval_loss), 5)
@@ -112,18 +113,18 @@ def eval_bleu_epoch(args, eval_data, eval_examples, model, tokenizer, split_tag,
 
                 top_preds = [pred[0].cpu().numpy() for pred in preds]
             else:
-                preds = model.generate(source_ids,
-                                       attention_mask=source_mask,
-                                       use_cache=True,
-                                       num_beams=args.beam_size,
-                                       early_stopping=args.task == 'summarize',
-                                       max_length=args.max_target_length)
-                # preds = model.module.generate(source_ids,
+                # preds = model.generate(source_ids,
                 #                        attention_mask=source_mask,
                 #                        use_cache=True,
                 #                        num_beams=args.beam_size,
                 #                        early_stopping=args.task == 'summarize',
                 #                        max_length=args.max_target_length)
+                preds = model.module.generate(source_ids,
+                                       attention_mask=source_mask,
+                                       use_cache=True,
+                                       num_beams=args.beam_size,
+                                       early_stopping=args.task == 'summarize',
+                                       max_length=args.max_target_length)
                 top_preds = list(preds.cpu().numpy())
             pred_ids.extend(top_preds)
 
@@ -220,18 +221,18 @@ def test_bleu(args, eval_data, eval_examples, model, tokenizer, split_tag, crite
 
                 top_preds = [pred[0].cpu().numpy() for pred in preds]
             else:
-                preds = model.generate(source_ids,
-                                       attention_mask=source_mask,
-                                       use_cache=False,
-                                       num_beams=args.beam_size,
-                                       early_stopping=args.task == 'summarize',
-                                       max_length=args.max_target_length)
-                # preds = model.module.generate(source_ids,
+                # preds = model.generate(source_ids,
                 #                        attention_mask=source_mask,
                 #                        use_cache=False,
                 #                        num_beams=args.beam_size,
                 #                        early_stopping=args.task == 'summarize',
                 #                        max_length=args.max_target_length)
+                preds = model.module.generate(source_ids,
+                                       attention_mask=source_mask,
+                                       use_cache=False,
+                                       num_beams=args.beam_size,
+                                       early_stopping=args.task == 'summarize',
+                                       max_length=args.max_target_length)
                 top_preds = list(preds.cpu().numpy())
             pred_ids.extend(top_preds)
 
@@ -524,10 +525,10 @@ def main():
                 model = T5ForConditionalGeneration.from_pretrained(args.model_name_or_path)
                 model.load_state_dict(torch.load(file))
                 model.to(args.device)
-            # if args.n_gpu > 1:
-            #     # for DataParallel
-            #     model = torch.nn.DataParallel(model)
-            # model.load_state_dict(torch.load(file))
+            if args.n_gpu > 1:
+                # for DataParallel
+                model = torch.nn.DataParallel(model)
+            model.load_state_dict(torch.load(file))
             test_examples, test_data = load_and_cache_gen_data_test(args, args.test_filename, pool, tokenizer, 'test',weight_dicts,logger,
                                                                only_src=True, is_sample=False)
             t1=time.time()

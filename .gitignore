@@ -3,3 +3,9 @@ data/
 
 # Python相关
 __pycache__/
+
+# 模型信息
+models/
+
+# 日志信息
+logs/

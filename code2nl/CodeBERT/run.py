@@ -426,14 +426,9 @@ def main():
         # model=torch.load(args.load_model_path)
     model.to(device)
     if args.local_rank != -1:
-        # Distributed training
-        try:
-            from apex.parallel import DistributedDataParallel as DDP
-        except ImportError:
-            raise ImportError(
-                "Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
-
-        model = DDP(model)
+        # Distributed training (使用 PyTorch 原生 DDP)
+        from torch.nn.parallel import DistributedDataParallel as DDP
+        model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank)
     elif args.n_gpu > 1:
         # multi-gpu training
         model = torch.nn.DataParallel(model)

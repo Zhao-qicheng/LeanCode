@@ -64,12 +64,18 @@ class Seq2Seq(nn.Module):
                 tgt_embeddings = self.encoder.embeddings(target_ids).permute([1,0,2]).contiguous()
             elif hasattr(self.encoder, 'shared'):
                 tgt_embeddings = self.encoder.shared(target_ids).permute([1,0,2]).contiguous()
-            # out = self.decoder(tgt_embeddings, encoder_output, tgt_mask=attn_mask,
-            #                     memory_key_padding_mask=(1 - source_mask).bool())
+            
+            # 不提取attention，直接使用decoder的输出
+            out = self.decoder(tgt_embeddings, encoder_output, tgt_mask=attn_mask,
+                                memory_key_padding_mask=(1 - source_mask).bool())
+            attentions = None  
 
-            outs = self.decoder(tgt_embeddings,encoder_output,tgt_mask=attn_mask,memory_key_padding_mask=(1-source_mask).bool())
-            out=outs[0]
-            attentions=outs[1]
+
+            # 提取attention
+            # outs = self.decoder(tgt_embeddings,encoder_output,tgt_mask=attn_mask,memory_key_padding_mask=(1-source_mask).bool())
+            # out=outs[0]
+            # attentions=outs[1]
+            
             hidden_states = torch.tanh(self.dense(out)).permute([1,0,2]).contiguous()
             lm_logits = self.lm_head(hidden_states)
             # Shift so that tokens < n predict n
@@ -103,7 +109,11 @@ class Seq2Seq(nn.Module):
                         tgt_embeddings = self.encoder.embeddings(input_ids).permute([1,0,2]).contiguous()
                     elif hasattr(self.encoder, 'shared'):
                         tgt_embeddings = self.encoder.shared(input_ids).permute([1,0,2]).contiguous()
-                    out = self.decoder(tgt_embeddings,context,tgt_mask=attn_mask,memory_key_padding_mask=(1-context_mask).bool())[0]
+
+                    # out = self.decoder(tgt_embeddings,context,tgt_mask=attn_mask,memory_key_padding_mask=(1-context_mask).bool())[0]
+
+                    out = self.decoder(tgt_embeddings,context,tgt_mask=attn_mask,memory_key_padding_mask=(1-context_mask).bool())
+                    
                     out = torch.tanh(self.dense(out))
                     hidden_states=out.permute([1,0,2]).contiguous()[:,-1,:]
                     out = self.lsm(self.lm_head(hidden_states)).data

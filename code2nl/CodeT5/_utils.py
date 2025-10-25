@@ -190,7 +190,7 @@ def caculate_tokens(code):
     return len(tokens)
 
 def convert_examples_to_features(item):
-    example, example_index, tokenizer, args, stage,weights_dicts = item
+    example, example_index, tokenizer, args, stage,weights_dicts,logger = item
 
     if args.model_type in ['t5', 'codet5'] and args.add_task_prefix:
         if args.sub_task != 'none':
