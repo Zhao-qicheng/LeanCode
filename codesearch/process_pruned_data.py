@@ -53,9 +53,17 @@ def preprocess_test_data_new(DATA_DIR, test_batch_size=1000):
 
 
 
+# if __name__ == '__main__':
+#     ratios=['10','20','30','40','50']
+#     for ratio in ratios:
+#         preprocess_test_data_new('./../data/codesearch/slimcode/'+ratio)
+#         preprocess_test_data_new('./../data/codesearch/dietcode/' + ratio)
+#         preprocess_test_data_new('./../data/codesearch/leancode_d/' + ratio)
 if __name__ == '__main__':
     ratios=['10','20','30','40','50']
     for ratio in ratios:
-        preprocess_test_data_new('./../data/codesearch/slimcode/'+ratio)
+        # slimcode 需要区分 codebert 和 codet5
+        preprocess_test_data_new('./../data/codesearch/slimcode/codebert/'+ratio)
+        preprocess_test_data_new('./../data/codesearch/slimcode/codet5/'+ratio)
         preprocess_test_data_new('./../data/codesearch/dietcode/' + ratio)
         preprocess_test_data_new('./../data/codesearch/leancode_d/' + ratio)

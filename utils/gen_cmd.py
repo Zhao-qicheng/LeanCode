@@ -39,7 +39,8 @@ def generate_command_code2nl_codebert(task_type, model_type, pruning_strategy, p
         ratios={10:0.9,20:0.8,30:0.7,40:0.6,50:0.5}
         ratio=ratios[pruning_ratio]
         if pruning_strategy=='slimcode':
-            data_path = f"./data/{task_type}/CodeSearchNet/java/slimcode/{model_type}/10/test.txt"
+            # data_path = f"./data/{task_type}/CodeSearchNet/java/slimcode/{model_type}/10/test.txt"
+            data_path = f"./data/{task_type}/slimcode/{model_type}/{pruning_ratio}/test.txt"
         else :
             data_path = f"./data/{task_type}/CodeSearchNet/java/test.jsonl"
     model_type_ = 'roberta'
@@ -60,7 +61,8 @@ def generate_command_code2nl_codet5(task_type, model_type, pruning_strategy, pru
         ratios={10:0.9,20:0.8,30:0.7,40:0.6,50:0.5}
         ratio=ratios[pruning_ratio]
         if pruning_strategy=='slimcode':
-            data_path = f"./data/{task_type}/CodeSearchNet/java/slimcode/{model_type}/10"
+            data_path = f"./data/{task_type}/slimcode/{model_type}/{pruning_ratio}"
+            # data_path = f"./data/{task_type}/CodeSearchNet/java/slimcode/{model_type}/10"
         else :
             data_path = f"./data/{task_type}/CodeSearchNet/java"
     model_path = 'Salesforce/codet5-base'
