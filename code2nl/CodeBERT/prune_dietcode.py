@@ -286,10 +286,10 @@ dietcode_lowest_ranked_token = []
 encoder_decoder_lowest_ranked_token = []
 
 def get_token_attention():
-    with open('./utils/low_rated_word_dietcode', 'r') as f:
+    with open('../../utils/low_rated_word_dietcode', 'r') as f:
         for token in f.readlines():
             dietcode_lowest_ranked_token.append(token.replace('\n', ''))
-    with open('./utils/low_rated_word_encoder_decoder', 'r') as f:
+    with open('../../utils/low_rated_word_encoder_decoder', 'r') as f:
         for token in f.readlines():
             encoder_decoder_lowest_ranked_token.append(token.replace('\n', ''))
 
@@ -446,3 +446,134 @@ class Code_Reduction():  # self.statement_attention: statement categories' atten
                 result_.append(y)
         return ' '.join(result_[:self.targetLength])
         # return ' '.join(' '.join(x) for x in result)
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+    return False
+
+def assimilate_code_string_and_integer(code, string_mask=" string ", number_mask="10"):
+    quotation_index_list = []
+    for i in range(0, len(code)):
+        if code[i] == "\"":
+            quotation_index_list.append(i)
+    for i in range(len(quotation_index_list) - 1, 0, -2):
+        code = code[:quotation_index_list[i-1] + 1] + string_mask + code[quotation_index_list[i]:]
+
+    tokens = code.split(" ")
+    for i in range(0, len(tokens)):
+        if is_number(tokens[i]):
+            tokens[i] = number_mask
+    code = " ".join(tokens)
+    return code
+
+def caculate_tokens(code):
+    tokens = code.split(' ')
+    if len(tokens) > 0 and tokens[0] == '@':
+        if len(tokens) > 2 and tokens[2] == '(':
+            try:
+                start = tokens.index(')')
+                tokens = tokens[start+1:]
+            except ValueError:
+                pass
+        else:
+            tokens = tokens[2:]
+    current_token = []
+    for i in range(len(tokens)):
+        token = tokens[i]
+        token = camel_case_split(token)
+        for t in token:
+            current_token.append(t)
+    tokens = current_token
+    return len(tokens)
+
+def format_str(string):
+    for char in ['\r\n', '\r', '\n']:
+        string = string.replace(char, ' ')
+    return string
+
+
+if __name__ == '__main__':
+    import json
+    from tqdm import tqdm
+    
+    Dir = '../..'  # LeanCode 项目根目录路径
+    
+    # 所有剪枝比例
+    ratios = [0.9, 0.8, 0.7, 0.6, 0.5]
+    ratio_names = ['10', '20', '30', '40', '50']
+    
+    print("=" * 70)
+    print("开始生成 Code2NL (CodeBERT) 的 DietCode 剪枝数据...")
+    print("=" * 70)
+    
+    # 生成 DietCode 数据
+    for ratio, ratio_name in zip(ratios, ratio_names):
+        print(f"\n处理 DietCode - {ratio_name}% 剪枝...")
+        dir_path = Dir + f'/data/code2nl/dietcode/{ratio_name}'
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        
+        with open(Dir + '/data/code2nl/CodeSearchNet/java/test.jsonl', 'r') as r, \
+             open(dir_path + '/test.jsonl', 'w') as w:
+            lines = r.readlines()
+            for line in tqdm(lines, desc=f"DietCode {ratio_name}%"):
+                try:
+                    line_dic = json.loads(line.strip())
+                    code = ' '.join([format_str(token) for token in line_dic['code_tokens']])
+                    code = assimilate_code_string_and_integer(code)
+                    
+                    target_len = int(caculate_tokens(code) * ratio)
+                    if target_len < 1:
+                        target_len = 1
+                    pruned_code = delete_with_algorithm_of_dietcode(code, target_len, 'dietcode', 'code2nl')
+                    
+                    # 保持原始 jsonl 格式，只替换 code_tokens
+                    line_dic['code_tokens'] = pruned_code.split()
+                    w.write(json.dumps(line_dic) + '\n')
+                except Exception as e:
+                    print(f"\n⚠️  处理行时出错: {str(e)}")
+                    continue
+        
+        print(f"✓ DietCode {ratio_name}% 完成")
+    
+    print("\n" + "=" * 70)
+    print("开始生成 Code2NL (CodeBERT) 的 LeanCode_d 剪枝数据...")
+    print("=" * 70)
+    
+    # 生成 LeanCode_d 数据
+    for ratio, ratio_name in zip(ratios, ratio_names):
+        print(f"\n处理 LeanCode_d - {ratio_name}% 剪枝...")
+        dir_path = Dir + f'/data/code2nl/leancode_d/{ratio_name}'
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        
+        with open(Dir + '/data/code2nl/CodeSearchNet/java/test.jsonl', 'r') as r, \
+             open(dir_path + '/test.jsonl', 'w') as w:
+            lines = r.readlines()
+            for line in tqdm(lines, desc=f"LeanCode_d {ratio_name}%"):
+                try:
+                    line_dic = json.loads(line.strip())
+                    code = ' '.join([format_str(token) for token in line_dic['code_tokens']])
+                    code = assimilate_code_string_and_integer(code)
+                    
+                    target_len = int(caculate_tokens(code) * ratio)
+                    if target_len < 1:
+                        target_len = 1
+                    pruned_code = delete_with_algorithm_of_dietcode(code, target_len, 'leancode_d', 'code2nl')
+                    
+                    # 保持原始 jsonl 格式，只替换 code_tokens
+                    line_dic['code_tokens'] = pruned_code.split()
+                    w.write(json.dumps(line_dic) + '\n')
+                except Exception as e:
+                    print(f"\n⚠️  处理行时出错: {str(e)}")
+                    continue
+        
+        print(f"✓ LeanCode_d {ratio_name}% 完成")
+    
+    print("\n" + "=" * 70)
+    print("✅ 所有 Code2NL (CodeBERT) 剪枝数据生成完成！")
+    print("=" * 70)

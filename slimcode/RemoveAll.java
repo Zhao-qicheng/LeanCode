@@ -1,5 +1,3 @@
-package githubcode.slimcode;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
@@ -10,7 +8,6 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,14 +16,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 class MyVisitor extends VoidVisitorAdapter<Void> {
-
     public Map map = new HashMap();
     public String methodCode = "";
     public String code = "";
     final private int STARTINDEX = 26;
-
     public MyVisitor(String code) {
         this.methodCode = code;
         this.code = "public class HelloWorld { " + this.methodCode.trim() + " }";
@@ -34,10 +28,8 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         this.map.put("identifiers",new ArrayList<SpanContent>());
         this.map.put("function_structure",new ArrayList<SpanContent>());
         this.map.put("method_signature",new ArrayList<SpanContent>());
-
         addStructKeyWords();
     }
-
     private void addStructKeyWords(){
         String[] removeList = new String[]{"if","else","try","catch","finally","for","while","do","switch","case"};
         ArrayList<SpanContent> functionStructureList = (ArrayList<SpanContent>) this.map.get("function_structure");
@@ -57,7 +49,6 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         }
         this.map.put("function_structure",functionStructureList);
     }
-
     //function invocation
     @Override
     public void visit(MethodCallExpr n, Void arg) {
@@ -70,7 +61,6 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         invocationList.add(spanContent);
         this.map.put("function_invocation",invocationList);
     }
-
     // identifiers
     @Override
     public void visit(NameExpr n, Void arg) {
@@ -83,7 +73,6 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         identifiersList.add(spanContent);
         this.map.put("identifiers",identifiersList);
     }
-
     @Override
     public void visit(VariableDeclarationExpr n, Void arg) {
         super.visit(n, arg);
@@ -97,9 +86,7 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
             identifiersList.add(spanContent);
         }
         this.map.put("identifiers",identifiersList);
-
     }
-
     // function structure - catch
     @Override
     public void visit(TryStmt n, Void arg) {
@@ -117,9 +104,7 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
             functionStructureList.add(spanContent);
             this.map.put("function_structure",functionStructureList);
         }
-
     }
-
     private void getRemoveString(int startIndex,int endIndex){
         String nString = this.methodCode.substring(startIndex - 26 -1,endIndex-26);
         int subStartIndex = nString.indexOf('(');
@@ -134,13 +119,11 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         } catch (Exception e){
             System.out.println(nString);
         }
-
     }
     private int getEndIndex(int startIndex,String nString){
         int leftBracket = 1;
         int startMark = 0;
         for(int i=startIndex+1; i<nString.length();i++){
-
             if(nString.charAt(i) == '(' && (nString.charAt(i-1) != '\'' || nString.charAt(i+1)!='\'') && startMark % 2 == 0 ){
                 leftBracket ++;
             }else if (nString.charAt(i) == ')' && startMark % 2 == 0 ){
@@ -175,9 +158,7 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         String selector = n.getSelector().toString();
         int startIndex1 = n.getBegin().get().column;
         int endIndex1 = n.getEnd().get().column;
-
         getRemoveString(startIndex1,endIndex1);
-
         NodeList<SwitchEntryStmt> entries = n.getEntries();
         for(SwitchEntryStmt entryStmt : entries){
             int startIndex2 = entryStmt.getBegin().get().column;
@@ -199,7 +180,6 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         int startIndex = n.getBegin().get().column;
         int endIndex = n.getEnd().get().column;
         getRemoveString(startIndex,endIndex);
-
     }
     // function structure - do while
     @Override
@@ -219,7 +199,6 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         int endIndex = n.getEnd().get().column;
         getRemoveString(startIndex,endIndex);
     }
-
     // function structure - for
     @Override
     public void visit(ForeachStmt n, Void arg) {
@@ -243,10 +222,7 @@ class MyVisitor extends VoidVisitorAdapter<Void> {
         this.map.put("method_signature",methodSignatureList);
 //        System.out.println(removeStr);
     }
-
 }
-
-
 public class RemoveAll {
     public String remove(String code) {
         // 解析Java源代码生成AST
@@ -267,10 +243,5 @@ public class RemoveAll {
         }
         inputStreamReader.close();
         return stringsList;
-
     }
-
-
 }
-
-

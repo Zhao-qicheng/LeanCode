@@ -312,10 +312,10 @@ dietcode_lowest_ranked_token = []
 cls_lowest_ranked_token = []
 
 def get_token_attention():
-    with open('./utils/low_rated_word_dietcode', 'r') as f:
+    with open('../utils/low_rated_word_dietcode', 'r') as f:
         for token in f.readlines():
             dietcode_lowest_ranked_token.append(token.replace('\n', ''))
-    with open('./utils/low_rated_word_cls', 'r') as f:
+    with open('../utils/low_rated_word_cls', 'r') as f:
         for token in f.readlines():
             cls_lowest_ranked_token.append(token.replace('\n', ''))
 
@@ -497,44 +497,71 @@ def format_str(string):
 
 
 if __name__ == '__main__':
-    Dir='./..'# change to your path to LeanCode project
-    new_lines=[]
-    ratio=0.9
-    dir=Dir+'/data/codesearch/dietcode/10'
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    with open(Dir+'/data/codesearch/java_test_0_fli.jsonl','r')as r,open(dir+'/test.txt','w')as w:
-        lines=r.readlines()
-        for line in tqdm(lines):
-            line_dic=json.loads(line)
-            code=' '.join([format_str(token) for token in line_dic['code_tokens']])
-            code = assimilate_code_string_and_integer(code)
-
-            target_len = int(caculate_tokens(code) * ratio)
-            code = delete_with_algorithm_of_dietcode(code, target_len, 'dietcode','codesearch')
-            doc=' '.join(line_dic['docstring_tokens'])
-            url=line_dic['url']
-            new_line=code+'<CODESPLIT>'+doc+'<CODESPLIT>'+url+'\n'
-            w.write(new_line)
-    new_lines=[]
-
-    ratio=0.9
-    dir=Dir+'./data/codesearch/leancode_d/10'
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    with open(Dir+'/data/codesearch/java_test_0_fli.jsonl','r')as r,open(dir+'/test.txt','w')as w:
-        lines=r.readlines()
-        for line in tqdm(lines):
-            line_dic=json.loads(line)
-            code=' '.join([format_str(token) for token in line_dic['code_tokens']])
-            code = assimilate_code_string_and_integer(code)
-
-            target_len = int(caculate_tokens(code) * ratio)
-            code = delete_with_algorithm_of_dietcode(code, target_len, 'leancode_d','codesearch')
-            doc=' '.join(line_dic['docstring_tokens'])
-            url=line_dic['url']
-            new_line=code+'<CODESPLIT>'+doc+'<CODESPLIT>'+url+'\n'
-            w.write(new_line)
+    Dir = './..'  # LeanCode 项目路径
+    
+    # 所有剪枝比例
+    ratios = [0.9, 0.8, 0.7, 0.6, 0.5]
+    ratio_names = ['10', '20', '30', '40', '50']
+    
+    print("=" * 60)
+    print("开始生成 DietCode 剪枝数据...")
+    print("=" * 60)
+    
+    # 生成 DietCode 数据
+    for ratio, ratio_name in zip(ratios, ratio_names):
+        print(f"\n处理 DietCode - {ratio_name}% 剪枝...")
+        dir_path = Dir + f'/data/codesearch/dietcode/{ratio_name}'
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        
+        with open(Dir + '/data/codesearch/java_test_0_fli.jsonl', 'r') as r, \
+             open(dir_path + '/test.txt', 'w') as w:
+            lines = r.readlines()
+            for line in tqdm(lines, desc=f"DietCode {ratio_name}%"):
+                line_dic = json.loads(line)
+                code = ' '.join([format_str(token) for token in line_dic['code_tokens']])
+                code = assimilate_code_string_and_integer(code)
+                
+                target_len = int(caculate_tokens(code) * ratio)
+                code = delete_with_algorithm_of_dietcode(code, target_len, 'dietcode', 'codesearch')
+                doc = ' '.join(line_dic['docstring_tokens'])
+                url = line_dic['url']
+                new_line = code + '<CODESPLIT>' + doc + '<CODESPLIT>' + url + '\n'
+                w.write(new_line)
+        
+        print(f"✓ DietCode {ratio_name}% 完成")
+    
+    print("\n" + "=" * 60)
+    print("开始生成 LeanCode_d 剪枝数据...")
+    print("=" * 60)
+    
+    # 生成 LeanCode_d 数据
+    for ratio, ratio_name in zip(ratios, ratio_names):
+        print(f"\n处理 LeanCode_d - {ratio_name}% 剪枝...")
+        dir_path = Dir + f'/data/codesearch/leancode_d/{ratio_name}'
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        
+        with open(Dir + '/data/codesearch/java_test_0_fli.jsonl', 'r') as r, \
+             open(dir_path + '/test.txt', 'w') as w:
+            lines = r.readlines()
+            for line in tqdm(lines, desc=f"LeanCode_d {ratio_name}%"):
+                line_dic = json.loads(line)
+                code = ' '.join([format_str(token) for token in line_dic['code_tokens']])
+                code = assimilate_code_string_and_integer(code)
+                
+                target_len = int(caculate_tokens(code) * ratio)
+                code = delete_with_algorithm_of_dietcode(code, target_len, 'leancode_d', 'codesearch')
+                doc = ' '.join(line_dic['docstring_tokens'])
+                url = line_dic['url']
+                new_line = code + '<CODESPLIT>' + doc + '<CODESPLIT>' + url + '\n'
+                w.write(new_line)
+        
+        print(f"✓ LeanCode_d {ratio_name}% 完成")
+    
+    print("\n" + "=" * 60)
+    print("✓ 所有 CodeSearch 剪枝数据生成完成！")
+    print("=" * 60)
 
 
 

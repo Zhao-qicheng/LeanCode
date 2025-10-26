@@ -1,18 +1,12 @@
-package githubcode.slimcode;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
 //import combination.SpanContent;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-
 public class RemoveInvocation {
-
     public static void markFlag(int[] codeFlag, SpanContent spanContent, int flag, String code, boolean[] otherFlag){
         int startWord = spanContent.startWord;
         int endWord = spanContent.endWord;
@@ -21,14 +15,9 @@ public class RemoveInvocation {
             if (otherFlag!=null){
                 otherFlag[i] = true;
             }
-
         }
     }
-
-
     public static int targetLength = 0;
-
-
     public static ArrayList<Integer> getRemovedIndex(String[] codeSplits,boolean[] codeFlag){
         ArrayList<Integer> removeIndex = new ArrayList<>();
             for (int j = codeSplits.length-1;j>=0;j--){
@@ -37,43 +26,29 @@ public class RemoveInvocation {
                 }
             }
         return removeIndex;
-
     }
-
-
     public static int id = 0;
-
     public static FileOutputStream fileOutputStream_log = null;
     public static OutputStreamWriter outputStreamWriter_log = null;
     public static BufferedWriter bufferedWriter_log = null;
-
-
     public static String removeCode(String code, Map map,int targetLength){
-
         ArrayList<SpanContent> invocationList = (ArrayList<SpanContent>) map.get("function_invocation");
-
         String[] codeSplits = code.split(" +");
         boolean[] invocationFlag = new boolean[codeSplits.length];
-
         int[] codeFlag = new int[codeSplits.length];
         for (SpanContent spanContent : invocationList){
             markFlag(codeFlag,spanContent,-1,code,invocationFlag);
         }
-
         String removedCode = "";
         ArrayList<Integer> removedIndex = getRemovedIndex(codeSplits, invocationFlag);
         for (int index : removedIndex){
             removedCode += codeSplits[index] + " ";
             codeSplits[index] = "";
         }
-
         String new_code = String.join(" ",codeSplits);
-
         return new_code;
     }
-
     public static String remove(String code){
-
         if (code.split(" +").length <= targetLength){
             return code;
         }
@@ -81,12 +56,10 @@ public class RemoveInvocation {
         CompilationUnit cu = JavaParser.parse(myVisitor.code);
         myVisitor.visit(cu, null);
 //        System.out.println(myVisitor.map);
-
 	    String removedCode = removeCode(code, myVisitor.map,targetLength);
 //        System.out.println(removedCode);
         return removedCode;
     }
-
     public static List<String> readFile(String path) throws IOException {
         FileInputStream fileInputStream = new FileInputStream(path);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
@@ -98,11 +71,8 @@ public class RemoveInvocation {
         }
         inputStreamReader.close();
         return stringsList;
-
     }
-
     public static void main(String[] args) {
-
         try {
             long startTime = System.currentTimeMillis();
             String stage = "train";
@@ -154,10 +124,8 @@ public class RemoveInvocation {
 //                outputStreamWriter_log.close();
 //                fileOutputStream_log.close();
 //            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

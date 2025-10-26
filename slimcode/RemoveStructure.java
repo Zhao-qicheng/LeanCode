@@ -1,18 +1,12 @@
-package githubcode.slimcode;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
 //import combination.SpanContent;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-
 public class RemoveStructure {
-
     public static void markFlag(int[] codeFlag, SpanContent spanContent, int flag, String code, boolean[] otherFlag){
         int startWord = spanContent.startWord;
         int endWord = spanContent.endWord;
@@ -21,13 +15,9 @@ public class RemoveStructure {
             if (otherFlag!=null){
                 otherFlag[i] = true;
             }
-
         }
     }
-
-
     public static int targetLength = 0;
-
     public static ArrayList<Integer> getRemovedIndex(String[] codeSplits,boolean[] codeFlag){
         ArrayList<Integer> removeIndex = new ArrayList<>();
         for (int j = codeSplits.length-1;j>=0;j--){
@@ -36,21 +26,12 @@ public class RemoveStructure {
             }
         }
         return removeIndex;
-
     }
-
-
     public static int id = 0;
-
-
-
     public static String removeCode(String code, Map map,int targetLength){
-
         ArrayList<SpanContent> structureList = (ArrayList<SpanContent>) map.get("function_structure");
-
         String[] codeSplits = code.split(" +");
         boolean[] structureFlag = new boolean[codeSplits.length];
-
         int[] codeFlag = new int[codeSplits.length];
         for (SpanContent spanContent : structureList){
             markFlag(codeFlag,spanContent,-1,code,structureFlag);
@@ -61,24 +42,18 @@ public class RemoveStructure {
             removedCode += codeSplits[index] + " ";
             codeSplits[index] = "";
         }
-
         String new_code = String.join(" ",codeSplits);
-
         return new_code;
     }
-
     public static String remove(String code){
-
         MyVisitor myVisitor = new MyVisitor(code);
         CompilationUnit cu = JavaParser.parse(myVisitor.code);
         myVisitor.visit(cu, null);
 //        System.out.println(myVisitor.map);
-
 	    String removedCode = removeCode(code, myVisitor.map,targetLength);
 //        System.out.println(removedCode);
         return removedCode;
     }
-
     public static List<String> readFile(String path) throws IOException {
         FileInputStream fileInputStream = new FileInputStream(path);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
@@ -90,22 +65,16 @@ public class RemoveStructure {
         }
         inputStreamReader.close();
         return stringsList;
-
     }
-
     public static void main(String[] args) {
-
         try {
             long startTime = System.currentTimeMillis();
 //            String stage = "train";
 //            List<String> stringList = readFile("code2nl_data/" + stage + "_new_0826.txt");
 //            FileOutputStream fileOutputStream = new FileOutputStream("removed_results/" + stage + "_remove_structure.txt");
-
             String stage = "valid";
             List<String> stringList = readFile("code2nl_data/" + stage + "_new_0916.txt");
             FileOutputStream fileOutputStream = new FileOutputStream("removed_results/" + stage + "_remove_structure.txt");
-
-
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
             BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
             double allRemovePercent = 0;
@@ -134,7 +103,6 @@ public class RemoveStructure {
                     bufferedWriter.write(newLine + "\n");
                     count++;
                 }catch (ParseProblemException e){
-
 //                    System.out.println(code);
                 }
 //            System.out.println("cut:"+code.split(" +").length);
@@ -153,10 +121,8 @@ public class RemoveStructure {
 //                outputStreamWriter_log.close();
 //                fileOutputStream_log.close();
 //            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
