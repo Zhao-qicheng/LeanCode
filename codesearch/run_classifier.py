@@ -441,8 +441,13 @@ def test(args, model, tokenizer,weight_dicts,t0, checkpoint=None, prefix="", mod
                     instance_rep = '<CODESPLIT>'.join(
                         [item.encode('ascii', 'ignore').decode('ascii') for item in instances[i]])
                     writer.write(instance_rep + '<CODESPLIT>' + '<CODESPLIT>'.join([str(l) for l in logit]) + '\n')
+            
+            # Save test metrics to file
+            output_metrics_file = os.path.join(output_dir, "test_metrics.txt")
+            with open(output_metrics_file, "w") as metrics_writer:
                 for key in sorted(result.keys()):
                     print("%s = %s" % (key, str(result[key])))
+                    metrics_writer.write("%s = %s\n" % (key, str(result[key])))
 
     return results
 
@@ -463,24 +468,42 @@ def load_and_cache_examples_test(args, task, tokenizer, weight_dict,ttype='test'
     output_mode = output_modes[task]
     # Load data features from cache or dataset file
     file_name = args.test_file.split('.')[0]
+    
+    # 构造缓存文件名
+    cached_features_file = os.path.join(args.data_dir, 'cached_{}_{}_{}_{}_{}_{}'.format(
+        ttype,
+        file_name,
+        str(args.model_type),
+        str(args.ratio),
+        str(task),
+        str(args.prune_strategy)))
 
-    # if os.path.exists(cached_features_file):
-    logger.info("Creating features from dataset file at %s", args.data_dir)
-    label_list = processor.get_labels()
+    # 尝试加载缓存
+    try:
+        logger.info("Loading features from cached file %s", cached_features_file)
+        features = torch.load(cached_features_file)
+        examples, instances = processor.get_test_examples(args.data_dir, args.test_file)
+    except:
+        logger.info("Creating features from dataset file at %s", args.data_dir)
+        label_list = processor.get_labels()
 
-    examples, instances = processor.get_test_examples(args.data_dir, args.test_file)
+        examples, instances = processor.get_test_examples(args.data_dir, args.test_file)
 
-    features = convert_examples_to_features_test(examples, label_list, args.ratio, tokenizer, output_mode,
-                                                 weight_dict,
-                                                 cls_token_at_end=bool(args.model_type in ['xlnet']),
-                                                 # xlnet has a cls token at the end
-                                                 cls_token=tokenizer.cls_token,
-                                                 sep_token=tokenizer.sep_token,
-                                                 cls_token_segment_id=2 if args.model_type in ['xlnet'] else 1,
-                                                 pad_on_left=bool(args.model_type in ['xlnet']),
-                                                 # pad on the left for xlnet
-                                                 pad_token_segment_id=4 if args.model_type in ['xlnet'] else 0,
-                                                 prune_strategy=args.prune_strategy)
+        features = convert_examples_to_features_test(examples, label_list, args.ratio, tokenizer, output_mode,
+                                                     weight_dict,
+                                                     cls_token_at_end=bool(args.model_type in ['xlnet']),
+                                                     # xlnet has a cls token at the end
+                                                     cls_token=tokenizer.cls_token,
+                                                     sep_token=tokenizer.sep_token,
+                                                     cls_token_segment_id=2 if args.model_type in ['xlnet'] else 1,
+                                                     pad_on_left=bool(args.model_type in ['xlnet']),
+                                                     # pad on the left for xlnet
+                                                     pad_token_segment_id=4 if args.model_type in ['xlnet'] else 0,
+                                                     prune_strategy=args.prune_strategy)
+
+        if args.local_rank in [-1, 0]:
+            logger.info("Saving features into cached file %s", cached_features_file)
+            torch.save(features, cached_features_file)
 
     dataset = CustomDataset(features)
 

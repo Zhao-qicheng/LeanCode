@@ -15,7 +15,8 @@ def main():
     MRR_dict = {}
     for language in languages:
         # set the file_dir to the path of 0_batch_result.txt which you want to caculate mrr
-        file_dir ='./codesearch/codet5/base/leancode/10/0_batch_result.txt'
+        # file_dir ='./codesearch/codet5/base/leancode/10/0_batch_result.txt'
+        file_dir ='./models/codesearch/codebert/base/0_batch_result.txt'
         ranks = []
         num_batch = 0
         with open(file_dir, encoding='utf-8') as f:

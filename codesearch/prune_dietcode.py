@@ -312,10 +312,10 @@ dietcode_lowest_ranked_token = []
 cls_lowest_ranked_token = []
 
 def get_token_attention():
-    with open('../utils/low_rated_word_dietcode', 'r') as f:
+    with open('./utils/low_rated_word_dietcode', 'r') as f:
         for token in f.readlines():
             dietcode_lowest_ranked_token.append(token.replace('\n', ''))
-    with open('../utils/low_rated_word_cls', 'r') as f:
+    with open('./utils/low_rated_word_cls', 'r') as f:
         for token in f.readlines():
             cls_lowest_ranked_token.append(token.replace('\n', ''))
 
