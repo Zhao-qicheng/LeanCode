@@ -10,13 +10,15 @@ import argparse
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--test_batch_size', type=int, default=1000)
+    parser.add_argument('--input_path', type=str, required=True, help='Path to the batch result file')
     args = parser.parse_args()
     languages = ['java']
     MRR_dict = {}
     for language in languages:
         # set the file_dir to the path of 0_batch_result.txt which you want to caculate mrr
         # file_dir ='./codesearch/codet5/base/leancode/10/0_batch_result.txt'
-        file_dir ='./models/codesearch/codebert/base/0_batch_result.txt'
+        # file_dir ='./models/codesearch/codebert/base/0_batch_result.txt'
+        file_dir = args.input_path
         ranks = []
         num_batch = 0
         with open(file_dir, encoding='utf-8') as f:
@@ -37,10 +39,18 @@ def main():
                 ranks.append(rank)
 
         mean_mrr = np.mean(1.0 / np.array(ranks))
-        print("{} {} mrr: {}".format(file_dir,language, mean_mrr))
         MRR_dict[language] = mean_mrr
-    for key, val in MRR_dict.items():
-        print("{} mrr: {}".format(key, val))
+    
+    # Write results to file
+    output_dir = os.path.dirname(args.input_path)
+    output_file = os.path.join(output_dir, 'mrr')
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for language in languages:
+            f.write("{} {} mrr: {}\n".format(args.input_path, language, MRR_dict[language]))
+        f.write("\n")
+        for key, val in MRR_dict.items():
+            f.write("{} mrr: {}\n".format(key, val))
+    print("Results saved to: {}".format(output_file))
 
 
 if __name__ == "__main__":
